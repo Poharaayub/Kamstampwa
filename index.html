@@ -41,6 +41,35 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* --- LOADING ANIMATION STYLES --- */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(29, 27, 32, 0.7); /* Scrim color */
+            backdrop-filter: blur(4px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            color: white;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--md-sys-color-primary-container);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* -------------------------------- */
+
         .warning-banner {
             background-color: var(--md-sys-color-error-container);
             color: var(--md-sys-color-on-error-container);
@@ -79,26 +108,32 @@
         .m3-input { background: transparent; border: none; width: 100%; padding: 8px 0; font-size: 16px; outline: none; color: var(--md-sys-color-on-surface); }
         .m3-label { font-size: 12px; color: var(--md-sys-color-primary); font-weight: 500; }
 
+        /* M3 FAB ICON ONLY STYLE */
         .m3-fab-floating {
             position: fixed;
-            bottom: 100px;
+            bottom: 104px;
             right: 24px;
-            left: 24px;
+            width: 56px;
+            height: 56px;
             background-color: var(--md-sys-color-primary-container);
             color: var(--md-sys-color-on-primary-container);
             border-radius: 16px;
-            padding: 18px 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
             box-shadow: var(--md-sys-elevation-3);
             border: none;
             cursor: pointer;
-            font-weight: 600;
             z-index: 50;
-            max-width: 500px;
-            margin: 0 auto;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+        }
+        .m3-fab-floating:active {
+            transform: scale(0.9);
+            box-shadow: none;
+        }
+        .m3-fab-floating:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .photo-chip {
@@ -242,6 +277,15 @@
 <body>
     <div id="loadingBar"></div>
 
+    <!-- ELEMENT LOADING OVERLAY -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="flex flex-col items-center">
+            <p id="loadingTitle" class="text-lg font-bold tracking-wide">Memproses Foto</p>
+            <p id="loadingProgress" class="text-sm opacity-80">Mohon tunggu sebentar...</p>
+        </div>
+    </div>
+
     <div class="warning-banner">
         <svg class="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 -960 960 960">
             <path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
@@ -312,9 +356,11 @@
                 <div id="pdfPhotoGrid" class="grid grid-cols-3 gap-3"></div>
             </div>
         </main>
+        <!-- FAB ICON PDF: SEND/PAPER PLANE -->
         <button onclick="generatePDF()" id="btnPDF" class="m3-fab-floating">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 -960 960 960"><path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/></svg>
-            <span id="btnPDFText">Bagikan PDF</span>
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 -960 960 960">
+                <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
+            </svg>
         </button>
     </div>
 
@@ -355,9 +401,11 @@
                 <div id="stampPhotoGrid" class="grid grid-cols-3 gap-3 mt-8"></div>
             </div>
         </main>
+        <!-- FAB ICON SHARE FOTO: SHARE NODES -->
         <button onclick="shareStampedPhotos()" id="btnShare" class="m3-fab-floating">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 -960 960 960"><path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38.5 23.5T240-360q-50 0-85-35t-35-85q0-50 35-85t85-35q22 0 43.5 8.5T322-568l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-22 0-43.5-8.5T638-712L356-548q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38.5-23.5T720-360q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Z"/></svg>
-            <span id="btnShareText">Bagikan Foto</span>
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 -960 960 960">
+                <path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38.5 23.5T240-360q-50 0-85-35t-35-85q0-50 35-85t85-35q22 0 43.5 8.5T322-568l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-22 0-43.5-8.5T638-712L356-548q2 6 3 13.5t1 14.5q0 7-1 14.5t-3 13.5l282 164q17-15 38.5-23.5T720-360q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-640q17 0 28.5-11.5T760-760q0-17-11.5-28.5T720-800q-17 0-28.5 11.5T680-760q0 17 11.5 28.5T720-720ZM240-440q17 0 28.5-11.5T280-480q0-17-11.5-28.5T240-520q-17 0-28.5 11.5T200-480q0 17 11.5 28.5T240-440Zm480 280q17 0 28.5-11.5T760-200q0-17-11.5-28.5T720-240q-17 0-28.5 11.5T680-200q0 17 11.5 28.5T720-160Z"/>
+            </svg>
         </button>
     </div>
 
@@ -423,7 +471,7 @@
                 <div class="nav-indicator"></div>
                 <div class="nav-icon">
                     <svg class="outlined w-6 h-6" fill="currentColor" viewBox="0 -960 960 960"><path d="M480-320q58 0 99-41t41-99q0-58-41-99t-99-41q-58 0-99 41t-41 99q0 58 41 99t99 41Zm0-80q-25 0-42.5-17.5T420-460q0-25 17.5-42.5T480-520q25 0 42.5 17.5T540-460q0 25-17.5 42.5T480-400Zm-320 240q-33 0-56.5-23.5T80-240v-440q0-33 23.5-56.5T160-760h126l74-80h240l74 80h126q33 0 56.5-23.5T880-680v440q0-33-23.5-56.5T800-160H160Zm0-80h640v-440H658l-74-80H376l-74 80H160v440Zm400-220Z"/></svg>
-                    <svg class="filled w-6 h-6" fill="currentColor" viewBox="0 -960 960 960"><path d="M160-160q-33 0-56.5-23.5T80-240v-440q0-33 23.5-56.5T160-760h126l74-80h240l74 80h126q33 0 56.5 23.5T880-680v440q0-33-23.5-56.5T800-160H160Zm320-200q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg>
+                    <svg class="filled w-6 h-6" fill="currentColor" viewBox="0 -960 960 960"><path d="M160-160q-33 0-56.5-23.5T80-240v-440q0-33 23.5-56.5T160-760h126l74-80h240l74 80h126q33 0 56.5-23.5T880-680v440q0-33-23.5-56.5T800-160H160Zm320-200q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg>
                 </div>
             </div>
             <span class="nav-label">Kamera</span>
@@ -447,7 +495,7 @@
 
         let pdfPhotos = [];
         let stampPhotos = [];
-        let isBackupEnabled = true; // State baru untuk kontrol backup
+        let isBackupEnabled = true;
 
         document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
 
@@ -455,16 +503,12 @@
             if (pdfPhotos.length > 0 || stampPhotos.length > 0) return "Data belum disimpan. Keluar?";
         };
 
-        // Fungsi kontrol backup gallery
         function toggleBackup(checkbox) {
             isBackupEnabled = checkbox.checked;
-            
-            // Sinkronisasi semua UI Sakelar & Lencana
             document.querySelectorAll('.backup-toggle-checkbox').forEach(cb => cb.checked = isBackupEnabled);
             document.querySelectorAll('.backup-status-text').forEach(badge => {
                 badge.innerText = isBackupEnabled ? 'Backup Aktif' : 'Backup Nonaktif';
-                if(isBackupEnabled) badge.classList.remove('disabled');
-                else badge.classList.add('disabled');
+                isBackupEnabled ? badge.classList.remove('disabled') : badge.classList.add('disabled');
             });
         }
 
@@ -489,35 +533,31 @@
         async function handleUpload(e, isCamera, type) {
             const files = Array.from(e.target.files);
             if (!files.length) return;
-            showLoading(true);
-
-            const photoPromises = files.map(file => processImage(file, isCamera, type));
-            try {
-                const results = await Promise.all(photoPromises);
-                if (type === 'pdf') pdfPhotos.push(...results);
-                else stampPhotos.push(...results);
-                renderPhotoGrid(type);
-            } catch (err) { console.error(err); }
-
+            showLoading(true, `Menyiapkan ${files.length} foto...`);
+            for (let i = 0; i < files.length; i++) {
+                showLoading(true, `Memproses ${i + 1} dari ${files.length}`);
+                try {
+                    const result = await processImage(files[i], isCamera, type);
+                    if (type === 'pdf') pdfPhotos.push(result);
+                    else stampPhotos.push(result);
+                    renderPhotoGrid(type);
+                } catch (err) { console.error("Gagal memproses gambar:", err); }
+            }
             showLoading(false);
             e.target.value = '';
         }
 
         function autoBackupToDevice(blob, type) {
-            // Cek state sebelum memicu download
             if (!isBackupEnabled) return;
-
             const now = new Date();
             const ts = `${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
             const fileName = `Kamstamp_Backup_${type.toUpperCase()}_${ts}.jpg`;
-            
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = fileName;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
             setTimeout(() => URL.revokeObjectURL(link.href), 100);
         }
 
@@ -532,20 +572,17 @@
                         let w = img.width, h = img.height;
                         if (w > h) { if (w > MAX) { h *= MAX/w; w = MAX; } }
                         else { if (h > MAX) { w *= MAX/h; h = MAX; } }
-                        
                         canvas.width = w; canvas.height = h;
                         const ctx = canvas.getContext('2d', { alpha: false });
                         ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
+                        ctx.imageSmoothingQuality = 'medium'; 
                         ctx.drawImage(img, 0, 0, w, h);
-
                         if (isCamera) {
                             const now = new Date();
                             const dayName = days[now.getDay()];
                             const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
                             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
                             const stamp = `${dayName}, ${dateStr} ${timeStr}`;
-                            
                             const fontSize = w > h ? Math.floor(w * 0.035) : Math.floor(w * 0.05); 
                             ctx.font = `bold ${fontSize}px 'Google Sans', sans-serif`;
                             ctx.textAlign = "center";
@@ -555,17 +592,16 @@
                             ctx.fillStyle = "#00FF00";
                             ctx.fillText(stamp, w/2, h - (fontSize * 1.5));
                         }
-
-                        const quality = 0.85; 
+                        const quality = 0.8; 
                         canvas.toBlob((blob) => {
-                            // Logic backup hanya untuk kamera
                             if (isCamera) autoBackupToDevice(blob, type);
-                            
+                            const previewUrl = URL.createObjectURL(blob);
                             resolve({
                                 id: Date.now() + Math.random(),
-                                data: canvas.toDataURL('image/jpeg', quality), 
+                                preview: previewUrl, 
                                 blob: blob,
-                                ratio: w/h
+                                ratio: w/h,
+                                canvas: canvas
                             });
                         }, 'image/jpeg', quality);
                     };
@@ -578,89 +614,93 @@
         function renderPhotoGrid(type) {
             const grid = document.getElementById(type === 'pdf' ? 'pdfPhotoGrid' : 'stampPhotoGrid');
             const list = type === 'pdf' ? pdfPhotos : stampPhotos;
-            const count = document.getElementById(type === 'pdf' ? 'pdfPhotoCount' : 'stampPhotoCount');
+            const countLabel = document.getElementById(type === 'pdf' ? 'pdfPhotoCount' : 'stampPhotoCount');
             grid.innerHTML = '';
             list.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'photo-chip';
                 div.innerHTML = `
-                    <img src="${p.data}" class="w-full h-full object-cover">
+                    <img src="${p.preview}" class="w-full h-full object-cover">
                     <div onclick="removePhoto('${p.id}', '${type}')" class="delete-badge">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 -960 960 960"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
                     </div>`;
                 grid.appendChild(div);
             });
-            count.innerText = list.length;
+            countLabel.innerText = list.length;
         }
 
         window.removePhoto = (id, type) => {
-            if (type === 'pdf') pdfPhotos = pdfPhotos.filter(p => p.id != id);
-            else stampPhotos = stampPhotos.filter(p => p.id != id);
+            const list = type === 'pdf' ? pdfPhotos : stampPhotos;
+            const idx = list.findIndex(p => p.id == id);
+            if (idx > -1) {
+                URL.revokeObjectURL(list[idx].preview);
+                if (type === 'pdf') pdfPhotos.splice(idx, 1);
+                else stampPhotos.splice(idx, 1);
+            }
             renderPhotoGrid(type);
         };
 
         window.clearAll = (type) => {
-            const count = type === 'pdf' ? pdfPhotos.length : stampPhotos.length;
-            if (count === 0) return;
-            if (confirm(`Hapus semua (${count}) foto?`)) {
+            const list = type === 'pdf' ? pdfPhotos : stampPhotos;
+            if (list.length === 0) return;
+            if (confirm(`Hapus semua (${list.length}) foto?`)) {
+                list.forEach(p => URL.revokeObjectURL(p.preview));
                 if (type === 'pdf') pdfPhotos = []; else stampPhotos = [];
                 renderPhotoGrid(type);
             }
         };
 
-        function showLoading(show) { document.getElementById('loadingBar').style.width = show ? '100%' : '0%'; }
+        function showLoading(show, message = "Memproses Foto") { 
+            const bar = document.getElementById('loadingBar');
+            const overlay = document.getElementById('loadingOverlay');
+            const progressText = document.getElementById('loadingProgress');
+            if(show) {
+                bar.style.width = '100%'; overlay.style.display = 'flex';
+                progressText.innerText = message;
+            } else {
+                bar.style.width = '0%'; overlay.style.display = 'none';
+            }
+        }
 
         async function generatePDF() {
             if (!pdfPhotos.length) return;
             const btn = document.getElementById('btnPDF');
-            const btnText = document.getElementById('btnPDFText');
             btn.disabled = true;
-            btnText.innerText = "Mengemas PDF...";
-            
+            showLoading(true, "Menyusun PDF...");
             try {
-                const doc = new jsPDF({ 
-                    orientation: 'p', unit: 'mm', format: 'a4', compress: true 
-                });
-
+                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
                 const jobName = document.getElementById('jobName').value || 'Pekerjaan';
                 const dateVal = document.getElementById('reportDate').value;
                 const shift = document.getElementById('shift').value;
                 const d = new Date(dateVal);
-                
                 const dayName = days[d.getDay()];
                 const dateStr = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-                const rawFileName = `${jobName} ${dayName} ${dateStr} ${shift}`;
-                const fileName = rawFileName.replace(/\s+/g, '_') + '.pdf';
+                const fileName = `${jobName} ${dayName} ${dateStr} ${shift}`.replace(/\s+/g, '_') + '.pdf';
 
                 for (let i = 0; i < pdfPhotos.length; i++) {
+                    showLoading(true, `Menyusun hal ${i+1} dari ${pdfPhotos.length}`);
                     const p = pdfPhotos[i];
                     if (i > 0) doc.addPage();
                     const pw = doc.internal.pageSize.getWidth();
                     const ph = doc.internal.pageSize.getHeight();
                     let dw = pw, dh = dw/p.ratio;
                     if (dh > ph) { dh = ph; dw = dh * p.ratio; }
-                    doc.addImage(p.data, 'JPEG', (pw-dw)/2, (ph-dh)/2, dw, dh, undefined, 'FAST');
+                    doc.addImage(p.canvas.toDataURL('image/jpeg', 0.75), 'JPEG', (pw-dw)/2, (ph-dh)/2, dw, dh, undefined, 'FAST');
                 }
-
                 const pdfBlob = doc.output('blob');
                 const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
                     await navigator.share({ files: [pdfFile], title: 'Laporan Pekerjaan' });
-                } else {
-                    doc.save(fileName);
-                }
+                } else { doc.save(fileName); }
             } catch (e) { console.error(e); }
-            finally { btn.disabled = false; btnText.innerText = "Bagikan PDF"; }
+            finally { btn.disabled = false; showLoading(false); }
         }
 
         async function shareStampedPhotos() {
             if (!stampPhotos.length) return;
             const btn = document.getElementById('btnShare');
-            const btnText = document.getElementById('btnShareText');
             btn.disabled = true;
-            btnText.innerText = "Menyiapkan...";
-
+            showLoading(true, "Mempersiapkan foto...");
             try {
                 const now = new Date();
                 const files = stampPhotos.map((p, i) => new File([p.blob], `Foto_Pohara_${now.getTime()}_${i}.jpg`, {type: 'image/jpeg'}));
@@ -674,7 +714,7 @@
                     });
                 }
             } catch (e) { console.error(e); }
-            finally { btn.disabled = false; btnText.innerText = "Bagikan Foto"; }
+            finally { btn.disabled = false; showLoading(false); }
         }
     </script>
 </body>
