@@ -589,11 +589,11 @@
                             ctx.strokeStyle = "rgba(0,0,0,0.7)";
                             ctx.lineWidth = Math.max(1, fontSize / 8);
                             ctx.strokeText(stamp, w/2, h - (fontSize * 1.5));
-                            ctx.fillStyle = "#00FF00";
+                            ctx.fillStyle = "#FFFFFF";
                             ctx.fillText(stamp, w/2, h - (fontSize * 1.5));
                         }
                         const quality = 0.8; 
-                        canvas.toBlob((blob) => {
+                        canvas.toBlob((blob) => { 
                             if (isCamera) autoBackupToDevice(blob, type);
                             const previewUrl = URL.createObjectURL(blob);
                             resolve({
